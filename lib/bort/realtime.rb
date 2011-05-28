@@ -5,7 +5,8 @@ module Bort
 
       VALID_PLATFORMS = %w(1 2 3 4)
       VALID_DIRECTIONS = %w(n s)
-      def initialize(options)
+      def initialize(orig, options={})
+        self.origin = orig
         load_options(options)
 
         download_options = {
@@ -31,7 +32,6 @@ module Bort
 
       private
       def load_options(options)
-        self.origin    = options.delete(:origin)
         self.platform  = options.delete(:platform)
         self.direction = options.delete(:direction)
 

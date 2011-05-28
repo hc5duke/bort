@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe Route do
-  before :each do
-    Bort('') # fake API key
-  end
-
-
   describe "when querying routes" do
 
     before :each do
@@ -27,7 +22,7 @@ describe Route do
       eta_file = File.read(File.expand_path('../responses/route_routeinfo.xml', __FILE__))
       Util.stub!(:download).and_return(eta_file)
 
-      @routeInfo = Route::RouteInfo.new(:route_number => 1)
+      @routeInfo = Route::RouteInfo.new(1)
     end
 
     it "should parse download data" do

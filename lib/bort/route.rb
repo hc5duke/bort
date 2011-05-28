@@ -55,7 +55,8 @@ module Bort
       attr_accessor :route_number, :schedule_number, :date, :name, :abbreviation,
         :route_id, :origin, :destination, :color, :holidays, :stations
 
-      def initialize(options={})
+      def initialize(number, options={})
+        self.route_number = number
         load_options(options)
 
         download_options = {
@@ -82,7 +83,6 @@ module Bort
 
       private
       def load_options(options)
-        self.route_number     = options.delete(:route_number)
         self.schedule_number  = options.delete(:schedule_number)
         self.date             = options.delete(:date)
 

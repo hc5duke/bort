@@ -1,17 +1,13 @@
 require 'spec_helper'
 
 describe Realtime do
-  before :each do
-    Bort('') # fake API key
-  end
-
   describe "when querying eta" do
 
     before :each do
       eta_file = File.read(File.expand_path('../responses/realtime_etd.xml', __FILE__))
       Util.stub!(:download).and_return(eta_file)
 
-      @etd = Realtime::Etd.new({:origin => 'RICH'})
+      @etd = Realtime::Etd.new('RICH')
     end
 
     it "should parse download data" do
