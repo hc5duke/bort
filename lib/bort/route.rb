@@ -45,7 +45,7 @@ module Bort
       def initialize(doc)
         self.name         = (doc/:name).inner_html
         self.abbreviation = (doc/:abbr).inner_html
-        self.route_id     = (doc/:route_id).inner_html
+        self.route_id     = (doc/:routeid).inner_html
         self.number       = (doc/:number).inner_html
         self.color        = (doc/:color).inner_html
       end
