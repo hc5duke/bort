@@ -36,6 +36,40 @@ module Bort
       response.body
     end
 
+    # param validation
+    VALID_AM_PM       = ['am', 'pm', nil]
+    VALID_DATE_STRING = ['today', 'now', nil]
+
+    def self.validate_time(time)
+      return unless time
+
+      hm, ap = time.split('+')
+      hh, mm = hm.split(':').map(&:to_i)
+
+      unless /^\d{1,2}:\d{1,2}+\w\w$/ === time &&
+        VALID_AM_PM.include?(ap.downcase) &&
+        (1..12) === hh &&
+        (0..59) === mm
+
+        raise InvalidTime.new(time)
+      end
+    end
+
+    def self.validate_date(date)
+      return if VALID_DATE_STRING.include?(date)
+
+      mm, dd, yyyy = date.split('/').map(&:to_i)
+      year = Time.now.year
+
+      unless /^\d{1,2}\/\d{1,2}\/\d{4}$/ === date &&
+        (1..12) === mm &&
+        (1..31) === dd &&
+        (year-1..year+1) === yyyy
+
+        raise InvalidDate.new(date)
+      end
+    end
+
     def self.stations; @@stations; end
 
     @@stations = {
@@ -84,4 +118,6 @@ module Bort
       :woak   => "West Oakland",
     }
   end
+
+  class InvalidDate < RuntimeError; end
 end

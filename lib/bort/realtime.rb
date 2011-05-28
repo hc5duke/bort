@@ -29,9 +29,9 @@ module Bort
         self.platform  = options.delete(:platform)
         self.direction = options.delete(:direction)
 
-        raise InvalidOrigin.new(origin) unless origin && Util.stations.keys.include?(origin.downcase.to_sym)
+        raise InvalidOrigin.new(origin) unless Util.stations.keys.include?(origin.downcase.to_sym)
         unless platform.nil?
-          raise InvalidPlatform.new(platform) unless (VALID_PLATFORMS).include?(platform.to_s)
+          raise InvalidPlatform.new(platform) unless platform.nil? || (VALID_PLATFORMS).include?(platform.to_s)
         end
         unless direction.nil?
           raise InvalidDirection.new(direction) unless (VALID_DIRECTIONS).include?(direction.to_s)

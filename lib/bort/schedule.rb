@@ -4,8 +4,6 @@ module Bort
       attr_accessor :origin, :destination, :time, :date, :before, :after,
         :legend, :schedule_number, :trips
 
-      VALID_AM_PM   = ['am', 'pm', nil]
-
       def initialize(command, orig, dest, options={})
         self.origin = orig
         self.destination = dest
@@ -43,22 +41,8 @@ module Bort
         self.before = options.delete(:before)
         self.after  = options.delete(:after)
 
-        unless time.nil?
-          hm, ap  = time.split('+')
-          raise InvalidTime.new(time) unless VALID_AM_PM.include?(ap)
-          hh, mm  = hm.split(':').map(&:to_i)
-          raise InvalidTime.new(time) unless (1..12) === hh && (0..59) === mm
-        end
-
-        unless date.nil?
-          return if %w(today now).include?(date)
-          mm    = date[0,2].to_i
-          dd    = date[3,2].to_i
-          yyyy  = date[6,4].to_i
-          year = Time.now.year
-
-          raise InvalidDate.new(date) unless (1..12) === mm && (1..31) === dd && (year..year+1) === yyyy
-        end
+        Util.validate_time(time)
+        Util.validate_date(date)
 
         self.legend = [[0, legend.to_i].max, 1].min unless legend.nil?
         self.before = [[0, before.to_i].max, 4].min unless before.nil?

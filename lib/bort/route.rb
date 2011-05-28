@@ -28,15 +28,7 @@ module Bort
         # date does not appear to be supported by the current API
         self.date     = options.delete(:date)
 
-        unless date.nil?
-          return if %w(today now).include?(date)
-          mm    = date[0,2].to_i
-          dd    = date[3,2].to_i
-          yyyy  = date[6,4].to_i
-          year = Time.now.year
-
-          raise InvalidDate.new(date) unless (1..12) === mm && (1..31) === dd && (year..year+1) === yyyy
-        end
+        Util.validate_date(date)
       end
     end
 
@@ -86,23 +78,9 @@ module Bort
         self.schedule_number  = options.delete(:schedule_number)
         self.date             = options.delete(:date)
 
-        raise InvalidRouteNumber unless route_number
-
-        # TODO: DRY this validation
-        unless date.nil?
-          return if %w(today now).include?(date)
-          mm    = date[0,2].to_i
-          dd    = date[3,2].to_i
-          yyyy  = date[6,4].to_i
-          year = Time.now.year
-
-          raise InvalidDate.new(date) unless (1..12) === mm && (1..31) === dd && (year..year+1) === yyyy
-        end
+        Util.validate_date(date)
       end
     end
-
-    class InvalidDate < RuntimeError; end
-    class InvalidRouteNumber < RuntimeError; end
 
   end
 end
