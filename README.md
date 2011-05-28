@@ -5,16 +5,12 @@ Another BART API ruby wrapper.
 Departure times
 
     require 'bort'
-    include Bort
-    Bort('MW9S-E7SL-26DU-VV8V') # set your own API key here
+    Bort::Bort('MW9S-E7SL-26DU-VV8V') # set your own API key here
 
-    estimates = Realtime::Etd.new('dubl')
-    estimates.etds.destination
+    estimates = Bort.departures('dubl') # same as Bort::Realtime::Etd.new('dubl')
+    estimates.etds.first.destination
     # => "Daly City"
-    estimates.etds.estimates.first.color
-    # => "blue"
-    estimates.etds.estimates.first.minutes
-    # => 3
-    station.name
-    # => "South San Francisco"
-
+    estimates.etds.first.estimates.first.color
+    # => "BLUE"
+    estimates.etds.first.estimates.map(&:minutes)
+    # => [8, 25]
