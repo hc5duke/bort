@@ -21,13 +21,7 @@ module Bort
         data = Hpricot(xml)
 
         self.fetched_at = Time.parse((data/:time).inner_html)
-        self.etds = (data/:etd).map do |etd|
-          {
-            :destination  => (etd/:destination).inner_html,
-            :abbreviation => (etd/:abbreviation).inner_html,
-            :estimates    => (etd/:estimate).map{|estimate| Train.new(estimate)},
-          }
-        end
+        self.etds = (data/:etd).map{|etd| EtdData.new(etd)}
       end
 
       private
@@ -42,6 +36,15 @@ module Bort
         unless direction.nil?
           raise InvalidDirection.new(direction) unless (VALID_DIRECTIONS).include?(direction.to_s)
         end
+      end
+    end
+
+    class EtdData
+      attr_accessor :destination, :abbreviation, :estimates
+      def initialize(doc)
+        self.destination  = (doc/:destination).inner_html
+        self.abbreviation = (doc/:abbreviation).inner_html
+        self.estimates    = (doc/:estimate).map{|estimate| Train.new(estimate)}
       end
     end
 
