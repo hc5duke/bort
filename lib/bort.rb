@@ -8,11 +8,20 @@ require 'bort/schedule'
 require 'bort/station'
 
 module Bort
-  def Bort(key)
-    @@api_key = key
+  def self.Bort(key)
+    Util.set_key(key)
   end
 
+  # shortcuts
+  def self.departures(orig, options={});               Realtime::Etd.new(orig, options); end
+  def self.by_arrival_time(orig, dest, options={});    Schedule::Arrive.new(orig, dest, options); end
+  def self.by_departure_time(orig, dest, options={});  Schedule::Depart.new(orig, dest, options); end
+
   class Util
+    def self.set_key(key)
+      @@api_key = key
+    end
+
     def self.download(params)
       params[:key] = @@api_key
       action    = params.delete(:action)
