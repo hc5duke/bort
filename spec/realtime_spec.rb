@@ -8,7 +8,6 @@ describe Realtime do
   describe "when querying eta" do
 
     before :each do
-      Bort('')
       eta_file = File.read(File.expand_path('../responses/realtime_etd.xml', __FILE__))
       Util.stub!(:download).and_return(eta_file)
 

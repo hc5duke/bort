@@ -9,7 +9,6 @@ describe Route do
   describe "when querying routes" do
 
     before :each do
-      Bort('')
       eta_file = File.read(File.expand_path('../responses/route_routes.xml', __FILE__))
       Util.stub!(:download).and_return(eta_file)
 
@@ -23,8 +22,16 @@ describe Route do
     end
   end
 
-=begin
   describe "when querying routeinfo" do
+    before :each do
+      eta_file = File.read(File.expand_path('../responses/route_routeinfo.xml', __FILE__))
+      Util.stub!(:download).and_return(eta_file)
+
+      @routeInfo = Route::RouteInfo.new(:route_number => 1)
+    end
+
+    it "should parse download data" do
+      @routeInfo.stations.count.should == 19
+    end
   end
-=end
 end
