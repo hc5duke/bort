@@ -8,13 +8,22 @@ describe Schedule do
       Util.stub!(:download).and_return(eta_file)
 
       @arrive       = Schedule::Arrive.new('dubl', 'daly')
+      @arrive_time  = Time.parse('May 27 17:28:00 -0700 2011')
       @origin_time  = Time.parse('May 27 16:50:00 -0700 2011')
       @xfer_time    = Time.parse('May 27 16:53:00 -0700 2011')
       @dest_time    = Time.parse('May 27 17:14:00 -0700 2011')
-      @origin_date  = Date.new(2011, 5, 27)
-      @xfer_date    = @origin_date
-      @dest_date    = @origin_date
+      @all_date     = Date.new(2011, 5, 27)
 
+    end
+
+    it "should parse download data" do
+      @arrive.origin.should == 'dubl'
+      @arrive.destination.should == 'daly'
+      @arrive.time.should == @arrive_time
+      @arrive.date.should == @all_date
+      @arrive.before.should == 2
+      @arrive.after.should == 2
+      @arrive.legend.length.should > 10 # some text
     end
 
     it "should parse trip data" do
@@ -24,9 +33,9 @@ describe Schedule do
       trip.destination.should       == 'CIVC'
       trip.fare.should              == 3.5
       trip.origin_time.should       == @origin_time
-      trip.origin_date.should       == @origin_date
+      trip.origin_date.should       == @all_date
       trip.destination_time.should  == @dest_time
-      trip.destination_date.should  == @dest_date
+      trip.destination_date.should  == @all_date
     end
 
     it "should parse leg data" do
@@ -37,9 +46,9 @@ describe Schedule do
       leg.origin.should             == 'ASHB'
       leg.destination.should        == 'MCAR'
       leg.origin_time.should        == @origin_time
-      leg.origin_date.should        == @origin_date
+      leg.origin_date.should        == @all_date
       leg.destination_time.should   == @xfer_time
-      leg.destination_date.should   == @xfer_date
+      leg.destination_date.should   == @all_date
       leg.line.should               == 'ROUTE 4'
       leg.bikeflag.should           == true
       leg.train_head_station.should == 'FRMT'

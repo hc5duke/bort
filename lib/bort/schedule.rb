@@ -1,16 +1,16 @@
 module Bort
   module Schedule
-    class Arrive
+    class ByTime
       attr_accessor :origin, :destination, :time, :date, :before, :after,
         :legend, :schedule_number, :trips
 
-      def initialize(orig, dest, options={})
+      def initialize(action, orig, dest, options={})
         self.origin = orig
         self.destination = dest
         load_options(options)
 
         download_options = {
-          :action => 'sched',
+          :action => action,
           :cmd => 'arrive',
         }
         download_options[:orig] = origin
@@ -24,14 +24,29 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.schedule_number = (data/:sched_num).inner_html
+        self.date             = Date.parse((data/:date).inner_html)
+        self.time             = Time.parse("#{(data/:date).inner_html} #{(data/:time).inner_html}")
+        self.before           = (data/:before).inner_html.to_i
+        self.after            = (data/:after).inner_html.to_i
+        self.legend           = (data/:legend).inner_html
+        self.schedule_number  = (data/:sched_num).inner_html
         self.trips = (data/:trip).map{|trip| Trip.new(trip)}
-        # TODO self.time = etc.
       end
 
       private
       def load_options(options)
         # TODO self.time = etc.
+      end
+    end
+
+    class Arrive < ByTime
+      def initialize(orig, dest, options={})
+        super('arrive', orig, dest, options)
+      end
+    end
+    class Depart < ByTime
+      def initialize(orig, dest, options={})
+        super('depart', orig, dest, options)
       end
     end
 
