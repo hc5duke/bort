@@ -1,4 +1,5 @@
 require 'net/http'
+require 'time'
 require 'hpricot'
 require 'bort/realtime'
 require 'bort/route'
