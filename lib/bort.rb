@@ -11,6 +11,7 @@ module Bort
   def self.Bort(key)
     Util.set_key(key)
   end
+  def Bort(key); Bort::Bort(key); end
 
   # shortcuts
   def self.departures(orig, options={});               Realtime::Etd.new(orig, options); end
