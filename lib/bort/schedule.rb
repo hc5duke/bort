@@ -4,14 +4,14 @@ module Bort
       attr_accessor :origin, :destination, :time, :date, :before, :after,
         :legend, :schedule_number, :trips
 
-      def initialize(action, orig, dest, options={})
+      def initialize(command, orig, dest, options={})
         self.origin = orig
         self.destination = dest
         load_options(options)
 
         download_options = {
-          :action => action,
-          :cmd => 'arrive',
+          :action => 'sched',
+          :cmd => command,
         }
         download_options[:orig] = origin
         download_options[:dest] = destination
