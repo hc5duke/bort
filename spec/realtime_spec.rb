@@ -5,7 +5,7 @@ describe Realtime do
     Bort('') # fake API key
   end
 
-  describe "when parsing ETA" do
+  describe "when querying eta" do
 
     before :each do
       Bort('')

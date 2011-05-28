@@ -13,8 +13,8 @@ module Bort
           :cmd => 'etd',
         }
         download_options[:orig] = origin
-        download_options[:plat] = '' if platform
-        download_options[:dir]  = '' if direction
+        download_options[:plat] = platform  if platform
+        download_options[:dir]  = direction if direction
 
         xml = Util.download(download_options)
         data = Hpricot(xml)
