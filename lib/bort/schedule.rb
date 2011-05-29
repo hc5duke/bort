@@ -166,6 +166,27 @@ module Bort
     end
 
     class Special
+      attr_accessor :legend, :special_schedules
+
+      def initialize(options={})
+        load_options(options)
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'special',
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.legend             = (data/:legend).inner_html
+        self.special_schedules  = (data/:special_schedule).map{|special| SpecialSchedule.new(special)}
+      end
+
+      private
+      def load_options(options)
+        self.legend = options.delete(:legend)
+      end
     end
 
     class StationSchedule
@@ -243,6 +264,23 @@ module Bort
       def initialize(doc)
         self.schedule_id    = doc.attributes['id'].to_i
         self.effective_date = Time.parse(doc.attributes['effectivedate'])
+      end
+    end
+
+    class SpecialSchedule
+      attr_accessor :start_date, :end_date, :start_time, :end_time,
+        :text, :link, :origin, :destination, :day_of_week, :routes_affected
+      def initialize(doc)
+        self.start_date       = Date.parse((doc/:start_date).inner_html)
+        self.end_date         = Date.parse((doc/:end_date).inner_html)
+        self.start_time       = Time.parse("#{start_date.to_s} #{(doc/:start_time).inner_html}")
+        self.end_time         = Time.parse("#{end_date.to_s} #{(doc/:end_time).inner_html}")
+        self.text             = (doc/:text).inner_html
+        self.link             = (doc/:link).inner_html
+        self.origin           = (doc/:orig).inner_html
+        self.destination      = (doc/:dest).inner_html
+        self.day_of_week      = (doc/:day_of_week).inner_html.split(',').map(&:to_i)
+        self.routes_affected  = (doc/:routes_affected).inner_html.split(',')
       end
     end
 

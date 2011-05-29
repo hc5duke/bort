@@ -123,9 +123,23 @@ describe Schedule do
   describe "when querying special schedules" do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'special'))
+      @special = Schedule::Special.new
     end
 
     it "should parse download data" do
+      @special.special_schedules.length.should == 5
+      sched = @special.special_schedules.first
+      sched.start_date.to_s.should == '2011-05-28'
+      sched.end_date.to_s.should == '2011-05-28'
+      sched.start_time.should == Time.parse('May 28 04:00:00 -0700 2011')
+      sched.end_time.should == Time.parse('May 28 07:30:00 -0700 2011')
+      sched.text.length.should > 10
+      sched.link.should == ''
+      sched.origin.should == ''
+      sched.destination.should == ''
+      sched.day_of_week.inspect.should == [6].inspect
+      sched.routes_affected.length.should == 8
+
     end
   end
 
