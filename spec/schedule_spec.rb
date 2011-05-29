@@ -105,4 +105,32 @@ describe Schedule do
       stop.bikeflag.should == true
     end
   end
+
+  describe "when querying schedules" do
+    before :each do
+      Util.stub!(:download).and_return(response_file('schedule', 'scheds'))
+    end
+
+    it "should parse download data" do
+    end
+  end
+
+  describe "when querying special schedules" do
+    before :each do
+      Util.stub!(:download).and_return(response_file('schedule', 'special'))
+    end
+
+    it "should parse download data" do
+    end
+  end
+
+  describe "when querying station schedule" do
+    before :each do
+      Util.stub!(:download).and_return(response_file('schedule', 'stnsched'))
+    end
+
+    it "should parse download data" do
+    end
+  end
+
 end

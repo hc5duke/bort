@@ -148,6 +148,15 @@ module Bort
       end
     end
 
+    class Schedules
+    end
+
+    class Special
+    end
+
+    class StationSchedule
+    end
+
     # helper classes
     class Trip
       attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
