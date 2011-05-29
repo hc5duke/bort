@@ -15,11 +15,11 @@ module Bort
           :orig   => origin,
           :dest   => destination,
         }
-        download_options[:time] = time    if time
-        download_options[:date] = date    if date
-        download_options[:b]    = before  if before
-        download_options[:a]    = after   if after
-        download_options[:l]    = legend  if legend
+        download_options[:time] = time
+        download_options[:date] = date
+        download_options[:b]    = before
+        download_options[:a]    = after
+        download_options[:l]    = legend
 
         xml = Util.download(download_options)
         data = Hpricot(xml)
@@ -92,7 +92,6 @@ module Bort
         self.schedule_number  = options.delete(:schedule_number)
 
         Util.validate_date(date)
-
       end
     end
 
@@ -113,6 +112,7 @@ module Bort
       end
     end
 
+    # helper classes
     class Trip
       attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
         :destination_time, :destination_date, :legs

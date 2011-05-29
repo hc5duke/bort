@@ -10,8 +10,8 @@ module Bort
           :action => 'route',
           :cmd => 'routes',
         }
-        download_options[:sched]  = schedule  if schedule
-        download_options[:date]   = date      if date
+        download_options[:sched]  = schedule
+        download_options[:date]   = date
 
         xml = Util.download(download_options)
         data = Hpricot(xml)
@@ -56,8 +56,8 @@ module Bort
           :cmd => 'routeinfo',
           :route => route_number,
         }
-        download_options[:sched]  = schedule_number if schedule_number
-        download_options[:date]   = date            if date
+        download_options[:sched]  = schedule_number
+        download_options[:date]   = date
 
         xml = Util.download(download_options)
         data = Hpricot(xml)
