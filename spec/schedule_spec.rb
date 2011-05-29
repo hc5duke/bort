@@ -4,8 +4,7 @@ describe Schedule do
   describe "when querying arrival times" do
 
     before :each do
-      eta_file = File.read(File.expand_path('../responses/schedule_arrive.xml', __FILE__))
-      Util.stub!(:download).and_return(eta_file)
+      Util.stub!(:download).and_return(response_file('schedule', 'arrive'))
 
       @arrive       = Schedule::Arrive.new('dubl', 'daly')
       @arrive_time  = Time.parse('May 27 17:28:00 -0700 2011')
@@ -58,8 +57,7 @@ describe Schedule do
   describe "when querying fares" do
 
     before :each do
-      eta_file = File.read(File.expand_path('../responses/schedule_fare.xml', __FILE__))
-      Util.stub!(:download).and_return(eta_file)
+      Util.stub!(:download).and_return(response_file('schedule', 'fare'))
       @fare = Schedule::Fare.new('dubl', 'daly')
     end
 
@@ -67,6 +65,21 @@ describe Schedule do
       @fare.schedule_number.should  == 29
       @fare.fare.should             == 3.1
     end
+  end
 
+  describe "when querying holidays" do
+
+    before :each do
+      Util.stub!(:download).and_return(response_file('schedule', 'holiday'))
+      @holiday = Schedule::Holiday.new
+    end
+
+    it "should parse download data" do
+      @holiday.holidays.length.should == 9
+      holiday = @holiday.holidays.first
+      holiday.name.should == 'Thanksgiving Day'
+      holiday.date.to_s.should == '2010-11-25'
+      holiday.schedule_type.should == 'Sunday'
+    end
   end
 end

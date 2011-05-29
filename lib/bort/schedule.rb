@@ -96,9 +96,27 @@ module Bort
       end
     end
 
+    class Holiday
+      attr_accessor :holidays
+
+      def initialize
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'holiday',
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.holidays = (data/:holiday).map{|holiday|HolidayData.new(holiday)}
+      end
+    end
+
     class Trip
       attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
         :destination_time, :destination_date, :legs
+
       def initialize(doc)
         self.origin           = doc.attributes['origin']
         self.destination      = doc.attributes['destination']
@@ -115,6 +133,7 @@ module Bort
       attr_accessor :order, :transfer_code, :origin, :destination,
         :origin_time, :origin_date, :destination_time, :destination_date,
         :line, :bikeflag, :train_head_station
+
       def initialize(doc)
         self.order              = doc.attributes['order'].to_i
         self.transfer_code      = doc.attributes['transfercode']
@@ -129,5 +148,16 @@ module Bort
         self.train_head_station = doc.attributes['trainheadstation']
       end
     end
+
+    class HolidayData
+      attr_accessor :name, :date, :schedule_type
+
+      def initialize(doc)
+        self.name           = (doc/:name).inner_html
+        self.date           = Date.parse((doc/:date).inner_html)
+        self.schedule_type  = (doc/:schedule_type).inner_html
+      end
+    end
+
   end
 end
