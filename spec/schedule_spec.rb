@@ -82,4 +82,27 @@ describe Schedule do
       holiday.schedule_type.should == 'Sunday'
     end
   end
+
+  describe "when querying route schedule" do
+
+    before :each do
+      Util.stub!(:download).and_return(response_file('schedule', 'routesched'))
+      @schedule = Schedule::RouteSchedule.new(6)
+    end
+
+    it "should parse download data" do
+      @schedule.schedule_number.should  == 29
+      @schedule.date.to_s.should        == '2011-05-27'
+      @schedule.trains.length.should    == 52
+
+      train = @schedule.trains.first
+      train.index.should == 1
+      train.stops.length.should == 19
+
+      stop = train.stops.first
+      stop.station.should == 'DALY'
+      stop.origin_time.should == Time.parse('May 27 06:13:00 -0700 2011')
+      stop.bikeflag.should == true
+    end
+  end
 end

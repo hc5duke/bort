@@ -112,6 +112,42 @@ module Bort
       end
     end
 
+    class RouteSchedule
+      attr_accessor :route_number, :schedule_number, :date, :legend, :trains
+
+      def initialize(route_num, options={})
+        self.route_number = route_num
+        load_options(options)
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'routesched',
+          :route  => route_number,
+          :sched  => schedule_number,
+          :date   => date,
+          :l      => legend,
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.date             = Date.parse((data/:date).inner_html)
+        self.schedule_number  = (data/:sched_num).inner_html.to_i
+        self.trains           = (data/:train).map{|train| TrainSchedule.new(train, date)}
+        self.legend           = (data/:legend).inner_html
+      end
+
+      private
+      def load_options(options)
+        self.date             = options.delete(:date)
+        self.schedule_number  = options.delete(:schedule_number)
+        self.legend           = options.delete(:legend)
+        self.date             = options.delete(:date)
+
+        Util.validate_date(date)
+      end
+    end
+
     # helper classes
     class Trip
       attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
@@ -159,5 +195,23 @@ module Bort
       end
     end
 
+    class TrainSchedule
+      attr_accessor :stops, :index
+
+      def initialize(doc, date)
+        self.index = doc.attributes['index'].to_i
+        self.stops = (doc/:stop).map{|stop| Stop.new(stop, date)}
+      end
+    end
+
+    class Stop
+      attr_accessor :station, :origin_time, :bikeflag
+
+      def initialize(doc, date)
+        self.station      = doc.attributes['station']
+        self.origin_time  = Time.parse("#{date.to_s} #{doc.attributes['origtime']}")
+        self.bikeflag     = doc.attributes['bikeflag'] == '1'
+      end
+    end
   end
 end
