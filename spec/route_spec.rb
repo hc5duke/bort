@@ -4,8 +4,7 @@ describe Route do
   describe "when querying routes" do
 
     before :each do
-      eta_file = File.read(File.expand_path('../responses/route_routes.xml', __FILE__))
-      Util.stub!(:download).and_return(eta_file)
+      Util.stub!(:download).and_return(response_file('route', 'routes'))
 
       @routes = Route::Routes.new
     end
@@ -19,8 +18,7 @@ describe Route do
 
   describe "when querying routeinfo" do
     before :each do
-      eta_file = File.read(File.expand_path('../responses/route_routeinfo.xml', __FILE__))
-      Util.stub!(:download).and_return(eta_file)
+      Util.stub!(:download).and_return(response_file('route', 'routeinfo'))
 
       @routeInfo = Route::RouteInfo.new(1)
     end
