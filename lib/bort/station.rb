@@ -86,7 +86,32 @@ module Bort
       end
     end
 
-    class Stations
+    def self.stations
+
+      download_options = {
+        :action => 'station',
+        :cmd => 'stns',
+      }
+
+      xml = Util.download(download_options)
+      data = Hpricot(xml)
+
+      (data/:station).map{|station| StationData.new(station)}
+    end
+
+    # TODO probably could reuse this class in Station::Info
+    class StationData
+      attr_accessor :name, :abbreviation, :address, :city, :county, :state, :zip
+
+      def initialize(doc)
+        self.name         = (doc/:name).inner_text
+        self.abbreviation = (doc/:abbr).inner_text
+        self.address      = (doc/:address).inner_text
+        self.city         = (doc/:city).inner_text
+        self.county       = (doc/:county).inner_text
+        self.state        = (doc/:state).inner_text
+        self.zip          = (doc/:zipcode).inner_text
+      end
     end
   end
 end

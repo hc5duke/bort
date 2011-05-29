@@ -65,9 +65,19 @@ describe Station do
 
     before :each do
       Util.stub!(:download).and_return(response_file('station', 'stns'))
+      @stations = Station.stations
     end
 
     it "should parse download data" do
+      @stations.length.should == 44
+      station = @stations.first
+      station.name.should == "12th St. Oakland City Center"
+      station.abbreviation.should == "12TH"
+      station.address.should == '1245 Broadway'
+      station.city.should == 'Oakland'
+      station.county.should == 'alameda'
+      station.state.should == 'CA'
+      station.zip.should == '94612'
     end
   end
 end
