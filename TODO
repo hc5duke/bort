@@ -1,2 +1,4 @@
 * finish rest of API
 * error handling
+* accept ruby time and date as well as strings
+* validate schedule number, station, etc
