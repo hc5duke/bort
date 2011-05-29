@@ -10,10 +10,20 @@ describe Realtime do
     end
 
     it "should parse download data" do
-      @estimates.estimates.length.should == 2
+      @estimates.trains.length.should == 5
       trains = @estimates.trains
       trains.length.should == 5
-      trains.map(&:minutes).sort.inspect.should == [2, 6, 14, 21, 36].inspect
+
+      train = trains.first
+      train.station.should == 'RICH'
+      train.destination.should == 'FRMT'
+      train.minutes.should == 6
+      train.platform.should == 2
+      train.direction.should == 's'
+      train.length.should == 6
+      train.color.should == 'orange'
+      train.hexcolor.should == '#ff9933'
+      train.bikeflag.should == true
     end
   end
 

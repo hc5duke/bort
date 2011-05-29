@@ -1,7 +1,7 @@
 module Bort
   module Realtime
     class Estimates
-      attr_accessor :origin, :platform, :direction, :fetched_at, :estimates
+      attr_accessor :origin, :platform, :direction, :fetched_at, :destinations, :trains
 
       VALID_PLATFORMS = %w(1 2 3 4)
       VALID_DIRECTIONS = %w(n s)
@@ -20,12 +20,18 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.fetched_at = Time.parse((data/:time).inner_html)
-        self.estimates  = (data/:etd).map{|etd| EstimateData.new(etd)}
-      end
+        self.origin = (data/:abbr).inner_text
+        self.fetched_at = Time.parse((data/:time).inner_text)
+        self.trains = []
+        self.destinations = []
 
-      def trains
-        estimates.map(&:trains).flatten
+        (data/:etd).map do |estimate|
+          destination = (estimate/:abbreviation).inner_text
+          self.destinations << destination
+          (estimate/:estimate).map do |train|
+            self.trains << Train.new(train, origin, destination)
+          end
+        end
       end
 
       private
@@ -39,26 +45,19 @@ module Bort
       end
     end
 
-    class EstimateData
-      attr_accessor :destination, :abbreviation, :trains
-      def initialize(doc)
-        self.destination  = (doc/:destination).inner_html
-        self.abbreviation = (doc/:abbreviation).inner_html
-        self.trains       = (doc/:estimate).map{|train| Train.new(train)}
-      end
-    end
-
     class Train
-      attr_accessor :minutes, :platform, :direction, :length, :color, :hexcolor, :bikeflag
+      attr_accessor :station, :destination, :minutes, :platform, :direction, :length, :color, :hexcolor, :bikeflag
 
-      def initialize(estimate)
-        self.minutes    = (estimate/:minutes).inner_html.to_i
-        self.platform   = (estimate/:platform).inner_html
-        self.direction  = (estimate/:direction).inner_html
-        self.length     = (estimate/:length).inner_html
-        self.color      = (estimate/:color).inner_html
-        self.hexcolor   = (estimate/:hexcolor).inner_html
-        self.bikeflag   = (estimate/:bikeflag).inner_html
+      def initialize(doc, orig, dest)
+        self.station      = orig
+        self.destination  = dest
+        self.minutes      = (doc/:minutes).inner_text.to_i
+        self.platform     = (doc/:platform).inner_text.to_i
+        self.direction    = (doc/:direction).inner_text[0,1].downcase
+        self.length       = (doc/:length).inner_text.to_i
+        self.color        = (doc/:color).inner_text.downcase
+        self.hexcolor     = (doc/:hexcolor).inner_text.downcase
+        self.bikeflag     = (doc/:bikeflag).inner_text == '1'
       end
     end
 
