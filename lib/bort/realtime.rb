@@ -1,7 +1,7 @@
 module Bort
   module Realtime
-    class Etd
-      attr_accessor :origin, :platform, :direction, :fetched_at, :etds
+    class Estimates
+      attr_accessor :origin, :platform, :direction, :fetched_at, :estimates
 
       VALID_PLATFORMS = %w(1 2 3 4)
       VALID_DIRECTIONS = %w(n s)
@@ -21,7 +21,7 @@ module Bort
         data = Hpricot(xml)
 
         self.fetched_at = Time.parse((data/:time).inner_html)
-        self.etds = (data/:etd).map{|etd| EtdData.new(etd)}
+        self.estimates  = (data/:etd).map{|etd| EstimateData.new(etd)}
       end
 
       private
@@ -29,17 +29,13 @@ module Bort
         self.platform  = options.delete(:platform)
         self.direction = options.delete(:direction)
 
-        raise InvalidOrigin.new(origin) unless Util.stations.keys.include?(origin.downcase.to_sym)
-        unless platform.nil?
-          raise InvalidPlatform.new(platform) unless platform.nil? || (VALID_PLATFORMS).include?(platform.to_s)
-        end
-        unless direction.nil?
-          raise InvalidDirection.new(direction) unless (VALID_DIRECTIONS).include?(direction.to_s)
-        end
+        raise InvalidOrigin.new(origin)       unless Util.stations.keys.map(&:to_s).include?(origin.downcase)
+        raise InvalidPlatform.new(platform)   unless platform.nil? || VALID_PLATFORMS.include?(platform.to_s)
+        raise InvalidDirection.new(direction) unless direction.nil? || VALID_DIRECTIONS.include?(direction.to_s)
       end
     end
 
-    class EtdData
+    class EstimateData
       attr_accessor :destination, :abbreviation, :estimates
       def initialize(doc)
         self.destination  = (doc/:destination).inner_html
