@@ -24,6 +24,10 @@ module Bort
         self.estimates  = (data/:etd).map{|etd| EstimateData.new(etd)}
       end
 
+      def trains
+        estimates.map(&:trains).flatten
+      end
+
       private
       def load_options(options)
         self.platform  = options.delete(:platform)
@@ -36,11 +40,11 @@ module Bort
     end
 
     class EstimateData
-      attr_accessor :destination, :abbreviation, :estimates
+      attr_accessor :destination, :abbreviation, :trains
       def initialize(doc)
         self.destination  = (doc/:destination).inner_html
         self.abbreviation = (doc/:abbreviation).inner_html
-        self.estimates    = (doc/:estimate).map{|estimate| Train.new(estimate)}
+        self.trains       = (doc/:estimate).map{|train| Train.new(train)}
       end
     end
 
