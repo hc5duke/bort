@@ -190,6 +190,37 @@ module Bort
     end
 
     class StationSchedule
+      attr_accessor :origin, :date, :schedule_number, :name, :abbreviation, :schedules, :legend
+
+      def initialize(origin, options={})
+        load_options(options)
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'special',
+          :org    => origin,
+          :date   => date,
+          :l      => legend,
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.date             = Date.parse((data/:date).inner_html)
+        self.schedule_number  = (data/:sched_num).inner_html.to_i
+        self.name             = (data/:name).inner_html
+        self.abbreviation     = (data/:abbr).inner_html
+        self.legend           = (data/:legend).inner_html
+        self.schedules        = (data/:station/:item).map{|line| StationLine.new(line, date)}
+      end
+
+      private
+      def load_options(options)
+        self.date   = options.delete(:date)
+        self.legend = options.delete(:legend)
+
+        Util.validate_date(date)
+      end
     end
 
     # helper classes
@@ -281,6 +312,19 @@ module Bort
         self.destination      = (doc/:dest).inner_html
         self.day_of_week      = (doc/:day_of_week).inner_html.split(',').map(&:to_i)
         self.routes_affected  = (doc/:routes_affected).inner_html.split(',')
+      end
+    end
+
+    class StationLine
+
+      attr_accessor :name, :train_head_station, :origin_time, :destination_time, :index, :bikeflag
+      def initialize(doc, date)
+        self.name               = doc.attributes['line']
+        self.train_head_station = doc.attributes['trainheadstation']
+        self.origin_time        = Time.parse("#{date} #{doc.attributes['origtime']}")
+        self.destination_time   = Time.parse("#{date} #{doc.attributes['desttime']}")
+        self.index              = doc.attributes['trainidx'].to_i
+        self.bikeflag           = doc.attributes['bikeflag'] == '1'
       end
     end
 

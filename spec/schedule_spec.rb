@@ -139,16 +139,28 @@ describe Schedule do
       sched.destination.should == ''
       sched.day_of_week.inspect.should == [6].inspect
       sched.routes_affected.length.should == 8
-
     end
   end
 
   describe "when querying station schedule" do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'stnsched'))
+      @station = Schedule::StationSchedule.new('dubl')
     end
 
     it "should parse download data" do
+      @station.date.to_s.should == '2011-05-27'
+      @station.schedule_number.should == 29
+      @station.name.should == '12th St. Oakland City Center'
+      @station.abbreviation.should == '12TH'
+      @station.schedules.length.should == 444
+      sched = @station.schedules.first
+      sched.name.should == 'ROUTE 2'
+      sched.train_head_station.should == 'PITT'
+      sched.origin_time.should == Time.parse('May 27 04:36:00 -0700 2011')
+      sched.destination_time.should == Time.parse('May 27 05:17:00 -0700 2011')
+      sched.index.should == 1
+      sched.bikeflag.should == true
     end
   end
 
