@@ -149,6 +149,20 @@ module Bort
     end
 
     class Schedules
+      attr_accessor :schedules
+
+      def initialize
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'scheds',
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.schedules = (data/:schedule).map{|schedule| Schedule.new(schedule)}
+      end
     end
 
     class Special
@@ -222,5 +236,15 @@ module Bort
         self.bikeflag     = doc.attributes['bikeflag'] == '1'
       end
     end
+
+    class Schedule
+      attr_accessor :schedule_id, :effective_date
+
+      def initialize(doc)
+        self.schedule_id    = doc.attributes['id'].to_i
+        self.effective_date = Time.parse(doc.attributes['effectivedate'])
+      end
+    end
+
   end
 end

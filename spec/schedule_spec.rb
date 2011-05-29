@@ -109,9 +109,14 @@ describe Schedule do
   describe "when querying schedules" do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'scheds'))
+      @schedules = Schedule::Schedules.new
     end
 
     it "should parse download data" do
+      @schedules.schedules.length.should == 4
+      schedule = @schedules.schedules.first
+      schedule.schedule_id.should == 29
+      schedule.effective_date.should == Time.parse('Feb 19 00:00:00 -0800 2011')
     end
   end
 
