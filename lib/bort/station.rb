@@ -47,6 +47,43 @@ module Bort
     end
 
     class Info
+      attr_accessor :origin, :name, :abbreviation, :geo, :address, :city,
+        :county, :state, :zip, :north_routes, :south_routes,
+        :north_platforms, :south_platforms, :platform_info,
+        :intro, :cross_street, :food, :shopping, :attraction, :link
+
+      def initialize(orig)
+        self.origin = orig
+
+        download_options = {
+          :action => 'station',
+          :cmd => 'stninfo',
+          :orig => origin,
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.name             = (data/:name).inner_text
+        self.abbreviation     = (data/:abbr).inner_text
+        self.geo              = [(data/:gtfs_latitude).inner_text, (data/:gtfs_longitude).inner_text]
+        self.address          = (data/:address).inner_text
+        self.city             = (data/:city).inner_text
+        self.county           = (data/:county).inner_text
+        self.state            = (data/:state).inner_text
+        self.zip              = (data/:zipcode).inner_text
+        self.north_routes     = (data/:north_routes/:route).map(&:inner_text)
+        self.south_routes     = (data/:south_routes/:route).map(&:inner_text)
+        self.north_platforms  = (data/:north_platforms/:platform).map(&:inner_text).map(&:to_i)
+        self.south_platforms  = (data/:south_platforms/:platform).map(&:inner_text).map(&:to_i)
+        self.platform_info    = (data/:platform_info).inner_text
+        self.intro            = (data/:intro).inner_text
+        self.cross_street     = (data/:cross_street).inner_text
+        self.food             = (data/:food).inner_text
+        self.shopping         = (data/:shopping).inner_text
+        self.attraction       = (data/:attraction).inner_text
+        self.link             = (data/:link).inner_text
+      end
     end
 
     class Stations
