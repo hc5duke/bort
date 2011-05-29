@@ -27,7 +27,7 @@ module Bort
       params[:key] = @@api_key
       action    = params.delete(:action)
 
-      queries   = params.map{|k, v| "#{k}=#{v}" }.join('&')
+      queries   = params.delete_if{|k, v|v.nil?}.map{|k, v| "#{k}=#{v}" }.join('&')
       request   = Net::HTTP::Get.new("/api/#{action}.aspx?#{queries}")
       response  = Net::HTTP.start('api.bart.gov') do |http|
         http.request(request)
