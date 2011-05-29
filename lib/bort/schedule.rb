@@ -11,10 +11,10 @@ module Bort
 
         download_options = {
           :action => 'sched',
-          :cmd => command,
+          :cmd    => command,
+          :orig   => origin,
+          :dest   => destination,
         }
-        download_options[:orig] = origin
-        download_options[:dest] = destination
         download_options[:time] = time    if time
         download_options[:date] = date    if date
         download_options[:b]    = before  if before
@@ -55,9 +55,44 @@ module Bort
         super('arrive', orig, dest, options)
       end
     end
+
     class Depart < ByTime
       def initialize(orig, dest, options={})
         super('depart', orig, dest, options)
+      end
+    end
+
+    class Fare
+      attr_accessor :origin, :destination, :date, :schedule_number, :fare
+
+      def initialize(orig, dest, options={})
+        self.origin = orig
+        self.destination = dest
+        load_options(options)
+
+        download_options = {
+          :action => 'sched',
+          :cmd    => 'fare',
+          :orig   => origin,
+          :dest   => destination,
+          :date   => date,
+          :sched  => schedule_number,
+        }
+
+        xml = Util.download(download_options)
+        data = Hpricot(xml)
+
+        self.schedule_number  = (data/:sched_num).inner_html.to_i
+        self.fare             = (data/:fare).inner_html.to_f
+      end
+
+      private
+      def load_options(options)
+        self.date             = options.delete(:date)
+        self.schedule_number  = options.delete(:schedule_number)
+
+        Util.validate_date(date)
+
       end
     end
 

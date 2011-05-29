@@ -54,4 +54,19 @@ describe Schedule do
       leg.train_head_station.should == 'FRMT'
     end
   end
+
+  describe "when querying fares" do
+
+    before :each do
+      eta_file = File.read(File.expand_path('../responses/schedule_fare.xml', __FILE__))
+      Util.stub!(:download).and_return(eta_file)
+      @fare = Schedule::Fare.new('dubl', 'daly')
+    end
+
+    it "should parse download data" do
+      @fare.schedule_number.should  == 29
+      @fare.fare.should             == 3.1
+    end
+
+  end
 end

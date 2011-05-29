@@ -11,9 +11,9 @@ module Bort
 
         download_options = {
           :action => 'etd',
-          :cmd => 'etd',
+          :cmd    => 'etd',
+          :orig   => origin,
         }
-        download_options[:orig] = origin
         download_options[:plat] = platform  if platform
         download_options[:dir]  = direction if direction
 
