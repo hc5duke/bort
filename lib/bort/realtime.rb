@@ -13,9 +13,9 @@ module Bort
           :action => 'etd',
           :cmd    => 'etd',
           :orig   => origin,
+          :plat   => platform,
+          :dir    => direction,
         }
-        download_options[:plat] = platform
-        download_options[:dir]  = direction
 
         xml = Util.download(download_options)
         data = Hpricot(xml)

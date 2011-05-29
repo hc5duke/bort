@@ -14,12 +14,12 @@ module Bort
           :cmd    => command,
           :orig   => origin,
           :dest   => destination,
+          :time   => time,
+          :date   => date,
+          :b      => before,
+          :a      => after,
+          :l      => legend,
         }
-        download_options[:time] = time
-        download_options[:date] = date
-        download_options[:b]    = before
-        download_options[:a]    = after
-        download_options[:l]    = legend
 
         xml = Util.download(download_options)
         data = Hpricot(xml)
