@@ -80,7 +80,7 @@ module Bort
     class Leg
       attr_accessor :order, :transfer_code, :origin, :destination,
         :origin_time, :origin_date, :destination_time, :destination_date,
-        :line, :bikeflag, :train_head_station
+        :line, :bike_flag, :train_head_station
 
       def self.parse(doc)
         leg                     = Leg.new
@@ -93,7 +93,7 @@ module Bort
         leg.origin_time         = Time.parse("#{doc.attributes['origtimedate']} #{doc.attributes['origtimemin']}")
         leg.destination_time    = Time.parse("#{doc.attributes['desttimedate']} #{doc.attributes['desttimemin']}")
         leg.line                = doc.attributes['line']
-        leg.bikeflag            = doc.attributes['bikeflag'] == '1'
+        leg.bike_flag           = doc.attributes['bikeflag'] == '1'
         leg.train_head_station  = doc.attributes['trainheadstation']
 
         leg
@@ -211,13 +211,13 @@ module Bort
     end
 
     class Stop
-      attr_accessor :station, :origin_time, :bikeflag
+      attr_accessor :station, :origin_time, :bike_flag
 
       def self.parse(doc, date)
         stop              = Stop.new
         stop.station      = doc.attributes['station']
         stop.origin_time  = Time.parse("#{date.to_s} #{doc.attributes['origtime']}")
-        stop.bikeflag     = doc.attributes['bikeflag'] == '1'
+        stop.bike_flag    = doc.attributes['bikeflag'] == '1'
 
         stop
       end
@@ -319,7 +319,7 @@ module Bort
 
     class StationLine
 
-      attr_accessor :name, :train_head_station, :origin_time, :destination_time, :index, :bikeflag
+      attr_accessor :name, :train_head_station, :origin_time, :destination_time, :index, :bike_flag
       def self.parse(doc, date)
         line                    = StationLine.new
         line.name               = doc.attributes['line']
@@ -327,7 +327,7 @@ module Bort
         line.origin_time        = Time.parse("#{date} #{doc.attributes['origtime']}")
         line.destination_time   = Time.parse("#{date} #{doc.attributes['desttime']}")
         line.index              = doc.attributes['trainidx'].to_i
-        line.bikeflag           = doc.attributes['bikeflag'] == '1'
+        line.bike_flag          = doc.attributes['bikeflag'] == '1'
 
         line
       end

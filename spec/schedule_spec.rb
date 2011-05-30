@@ -49,7 +49,7 @@ describe Schedule do
       leg.destination_time.should   == @xfer_time
       leg.destination_date.should   == @all_date
       leg.line.should               == 'ROUTE 4'
-      leg.bikeflag.should           == true
+      leg.bike_flag.should          == true
       leg.train_head_station.should == 'FRMT'
     end
   end
@@ -102,7 +102,7 @@ describe Schedule do
       stop = train.stops.first
       stop.station.should == 'DALY'
       stop.origin_time.should == Time.parse('May 27 06:13:00 -0700 2011')
-      stop.bikeflag.should == true
+      stop.bike_flag.should == true
     end
   end
 
@@ -160,7 +160,7 @@ describe Schedule do
       sched.origin_time.should == Time.parse('May 27 04:36:00 -0700 2011')
       sched.destination_time.should == Time.parse('May 27 05:17:00 -0700 2011')
       sched.index.should == 1
-      sched.bikeflag.should == true
+      sched.bike_flag.should == true
     end
   end
 

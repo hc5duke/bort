@@ -46,7 +46,7 @@ module Bort
     end
 
     class Train
-      attr_accessor :station, :destination, :minutes, :platform, :direction, :length, :color, :hexcolor, :bikeflag
+      attr_accessor :station, :destination, :minutes, :platform, :direction, :length, :color, :hexcolor, :bike_flag
 
       def initialize(doc, orig, dest)
         self.station      = orig
@@ -57,7 +57,7 @@ module Bort
         self.length       = (doc/:length).inner_text.to_i
         self.color        = (doc/:color).inner_text.downcase
         self.hexcolor     = (doc/:hexcolor).inner_text.downcase
-        self.bikeflag     = (doc/:bikeflag).inner_text == '1'
+        self.bike_flag    = (doc/:bikeflag).inner_text == '1'
       end
     end
 

@@ -23,7 +23,7 @@ describe Realtime do
       train.length.should == 6
       train.color.should == 'orange'
       train.hexcolor.should == '#ff9933'
-      train.bikeflag.should == true
+      train.bike_flag.should == true
     end
   end
 
