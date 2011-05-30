@@ -45,6 +45,10 @@ module Bort
       def info(options={})
         RouteInfo.new(number, options)
       end
+
+      def schedule(options={})
+        Schedule::RouteSchedule.new(number, options)
+      end
     end
 
     class RouteInfo
