@@ -34,6 +34,21 @@ module Bort
         end
       end
 
+      def select(type, value=nil)
+        filters =
+          if type.class == Hash
+            type
+          else
+            { type => value }
+          end
+        trains.select do |train|
+          filters.all? do |type, value|
+            train.send(type) == value
+          end
+        end
+      end
+      alias :filter :select
+
       private
       def load_options(options)
         self.platform  = options.delete(:platform)

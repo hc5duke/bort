@@ -25,6 +25,22 @@ describe Realtime do
       train.hexcolor.should == '#ff9933'
       train.bike_flag.should == true
     end
+
+    it "should parse download data" do
+      @estimates.trains.length.should == 5
+      trains = @estimates.select(:color, 'red')
+      trains.length.should == 2
+
+      train = trains.first
+      train.color.should == 'red'
+
+      trains = @estimates.select({:color => 'red', :length => 8})
+      trains.length.should == 1
+
+      train = trains.first
+      train.color.should == 'red'
+      train.length.should == 8
+    end
   end
 
 end
