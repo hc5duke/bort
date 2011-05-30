@@ -32,7 +32,7 @@ describe Route do
     before :each do
       Util.stub!(:download).and_return(response_file('route', 'routeinfo'))
 
-      @routeInfo = Route::RouteInfo.new(1)
+      @routeInfo = Route::Info.new(1)
     end
 
     it "should parse download data" do

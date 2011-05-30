@@ -1,5 +1,31 @@
 module Bort
   module Route
+    class Route
+      attr_accessor :name, :abbreviation, :route_id, :number, :color
+      def self.parse(doc)
+        route = Route.new
+        route.name         = (doc/:name).inner_text
+        route.abbreviation = (doc/:abbr).inner_text
+        route.route_id     = (doc/:routeid).inner_text
+        route.number       = (doc/:number).inner_text
+        route.color        = (doc/:color).inner_text
+
+        route
+      end
+
+      def info(options={})
+        Info.new(number, options)
+      end
+
+      def schedule(options={})
+        Schedule::RouteSchedule.new(number, options)
+      end
+    end
+
+    def self.routes(options={})
+      Routes.new(options).routes
+    end
+
     class Routes
       attr_accessor :schedule, :date, :schedule_number, :routes
 
@@ -16,9 +42,9 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.schedule_number = (data/:sched_num).inner_html
+        self.schedule_number = (data/:sched_num).inner_text
         self.routes = (data/:route).map do |route|
-          Route.new(route)
+          Route.parse(route)
         end
       end
 
@@ -32,26 +58,7 @@ module Bort
       end
     end
 
-    class Route
-      attr_accessor :name, :abbreviation, :route_id, :number, :color
-      def initialize(doc)
-        self.name         = (doc/:name).inner_html
-        self.abbreviation = (doc/:abbr).inner_html
-        self.route_id     = (doc/:routeid).inner_html
-        self.number       = (doc/:number).inner_html
-        self.color        = (doc/:color).inner_html
-      end
-
-      def info(options={})
-        RouteInfo.new(number, options)
-      end
-
-      def schedule(options={})
-        Schedule::RouteSchedule.new(number, options)
-      end
-    end
-
-    class RouteInfo
+    class Info
       attr_accessor :route_number, :schedule_number, :date, :name, :abbreviation,
         :route_id, :origin, :destination, :color, :holidays, :stations
 
@@ -70,15 +77,15 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.schedule_number  = (data/:sched_num).inner_html
-        self.name             = (data/:route/:name).inner_html
-        self.abbreviation     = (data/:route/:abbr).inner_html
-        self.route_number     = (data/:route/:number).inner_html
-        self.origin           = (data/:route/:origin).inner_html
-        self.destination      = (data/:route/:destination).inner_html
-        self.color            = (data/:route/:color).inner_html
-        self.holidays         = (data/:route/:holidays).inner_html
-        self.stations         = (data/:route/:config/:station).map(&:inner_html)
+        self.schedule_number  = (data/:sched_num).inner_text
+        self.name             = (data/:route/:name).inner_text
+        self.abbreviation     = (data/:route/:abbr).inner_text
+        self.route_number     = (data/:route/:number).inner_text
+        self.origin           = (data/:route/:origin).inner_text
+        self.destination      = (data/:route/:destination).inner_text
+        self.color            = (data/:route/:color).inner_text
+        self.holidays         = (data/:route/:holidays).inner_text
+        self.stations         = (data/:route/:config/:station).map(&:inner_text)
       end
 
       private
