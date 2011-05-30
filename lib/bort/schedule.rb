@@ -63,7 +63,7 @@ module Bort
         :destination_time, :destination_date, :legs
 
       def self.parse(doc)
-        trip = Trip.new
+        trip                  = Trip.new
         trip.origin           = doc.attributes['origin']
         trip.destination      = doc.attributes['destination']
         trip.fare             = doc.attributes['fare'].to_f
@@ -83,7 +83,7 @@ module Bort
         :line, :bikeflag, :train_head_station
 
       def self.parse(doc)
-        leg = Leg.new
+        leg                     = Leg.new
         leg.order               = doc.attributes['order'].to_i
         leg.transfer_code       = doc.attributes['transfercode']
         leg.origin              = doc.attributes['origin']
@@ -146,7 +146,20 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      (data/:holiday).map{|holiday|HolidayData.new(holiday)}
+      (data/:holiday).map{|holiday|HolidayData.parse(holiday)}
+    end
+
+    class HolidayData
+      attr_accessor :name, :date, :schedule_type
+
+      def self.parse(doc)
+        data                = HolidayData.new
+        data.name           = (doc/:name).inner_html
+        data.date           = Date.parse((doc/:date).inner_html)
+        data.schedule_type  = (doc/:schedule_type).inner_html
+
+        data
+      end
     end
 
     class RouteSchedule
@@ -170,7 +183,7 @@ module Bort
 
         self.date             = Date.parse((data/:date).inner_html)
         self.schedule_number  = (data/:sched_num).inner_html.to_i
-        self.trains           = (data/:train).map{|train| TrainSchedule.new(train, date)}
+        self.trains           = (data/:train).map{|train| TrainSchedule.parse(train, date)}
         self.legend           = (data/:legend).inner_html
       end
 
@@ -185,6 +198,31 @@ module Bort
       end
     end
 
+    class TrainSchedule
+      attr_accessor :stops, :index
+
+      def self.parse(doc, date)
+        schedule        = TrainSchedule.new
+        schedule.index  = doc.attributes['index'].to_i
+        schedule.stops  = (doc/:stop).map{|stop| Stop.parse(stop, date)}
+
+        schedule
+      end
+    end
+
+    class Stop
+      attr_accessor :station, :origin_time, :bikeflag
+
+      def self.parse(doc, date)
+        stop              = Stop.new
+        stop.station      = doc.attributes['station']
+        stop.origin_time  = Time.parse("#{date.to_s} #{doc.attributes['origtime']}")
+        stop.bikeflag     = doc.attributes['bikeflag'] == '1'
+
+        stop
+      end
+    end
+
     def self.schedules
       download_options = {
         :action => 'sched',
@@ -194,22 +232,55 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      (data/:schedule).map{|schedule| Schedule.new(schedule)}
+      (data/:schedule).map{|schedule| Schedule.parse(schedule)}
     end
 
-    def self.special_schedules
+    class Schedule
+      attr_accessor :schedule_id, :effective_date
+
+      def self.parse(doc)
+        schedule                = Schedule.new
+        schedule.schedule_id    = doc.attributes['id'].to_i
+        schedule.effective_date = Time.parse(doc.attributes['effectivedate'])
+
+        schedule
+      end
+    end
+
+    def self.special_schedules(print_legend=false)
       download_options = {
         :action => 'sched',
         :cmd    => 'special',
+        :l      => print_legend ? '1' : '0',
       }
 
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      # TODO: maybe print this out?
-      # legend = (data/:legend).inner_html
+      puts (data/:legend).inner_html if print_legend
 
-      (data/:special_schedule).map{|special| SpecialSchedule.new(special)}
+      (data/:special_schedule).map{|special| SpecialSchedule.parse(special)}
+    end
+
+    class SpecialSchedule
+      attr_accessor :start_date, :end_date, :start_time, :end_time,
+        :text, :link, :origin, :destination, :day_of_week, :routes_affected
+
+      def self.parse(doc)
+        schedule                  = SpecialSchedule.new
+        schedule.start_date       = Date.parse((doc/:start_date).inner_html)
+        schedule.end_date         = Date.parse((doc/:end_date).inner_html)
+        schedule.start_time       = Time.parse("#{schedule.start_date.to_s} #{(doc/:start_time).inner_html}")
+        schedule.end_time         = Time.parse("#{schedule.end_date.to_s} #{(doc/:end_time).inner_html}")
+        schedule.text             = (doc/:text).inner_html
+        schedule.link             = (doc/:link).inner_html
+        schedule.origin           = (doc/:orig).inner_html
+        schedule.destination      = (doc/:dest).inner_html
+        schedule.day_of_week      = (doc/:day_of_week).inner_html.split(',').map(&:to_i)
+        schedule.routes_affected  = (doc/:routes_affected).inner_html.split(',')
+
+        schedule
+      end
     end
 
     class StationSchedule
@@ -234,7 +305,7 @@ module Bort
         self.name             = (data/:name).inner_html
         self.abbreviation     = (data/:abbr).inner_html
         self.legend           = (data/:legend).inner_html
-        self.schedules        = (data/:station/:item).map{|line| StationLine.new(line, date)}
+        self.schedules        = (data/:station/:item).map{|line| StationLine.parse(line, date)}
       end
 
       private
@@ -246,71 +317,19 @@ module Bort
       end
     end
 
-    class HolidayData
-      attr_accessor :name, :date, :schedule_type
-
-      def initialize(doc)
-        self.name           = (doc/:name).inner_html
-        self.date           = Date.parse((doc/:date).inner_html)
-        self.schedule_type  = (doc/:schedule_type).inner_html
-      end
-    end
-
-    class TrainSchedule
-      attr_accessor :stops, :index
-
-      def initialize(doc, date)
-        self.index = doc.attributes['index'].to_i
-        self.stops = (doc/:stop).map{|stop| Stop.new(stop, date)}
-      end
-    end
-
-    class Stop
-      attr_accessor :station, :origin_time, :bikeflag
-
-      def initialize(doc, date)
-        self.station      = doc.attributes['station']
-        self.origin_time  = Time.parse("#{date.to_s} #{doc.attributes['origtime']}")
-        self.bikeflag     = doc.attributes['bikeflag'] == '1'
-      end
-    end
-
-    class Schedule
-      attr_accessor :schedule_id, :effective_date
-
-      def initialize(doc)
-        self.schedule_id    = doc.attributes['id'].to_i
-        self.effective_date = Time.parse(doc.attributes['effectivedate'])
-      end
-    end
-
-    class SpecialSchedule
-      attr_accessor :start_date, :end_date, :start_time, :end_time,
-        :text, :link, :origin, :destination, :day_of_week, :routes_affected
-      def initialize(doc)
-        self.start_date       = Date.parse((doc/:start_date).inner_html)
-        self.end_date         = Date.parse((doc/:end_date).inner_html)
-        self.start_time       = Time.parse("#{start_date.to_s} #{(doc/:start_time).inner_html}")
-        self.end_time         = Time.parse("#{end_date.to_s} #{(doc/:end_time).inner_html}")
-        self.text             = (doc/:text).inner_html
-        self.link             = (doc/:link).inner_html
-        self.origin           = (doc/:orig).inner_html
-        self.destination      = (doc/:dest).inner_html
-        self.day_of_week      = (doc/:day_of_week).inner_html.split(',').map(&:to_i)
-        self.routes_affected  = (doc/:routes_affected).inner_html.split(',')
-      end
-    end
-
     class StationLine
 
       attr_accessor :name, :train_head_station, :origin_time, :destination_time, :index, :bikeflag
-      def initialize(doc, date)
-        self.name               = doc.attributes['line']
-        self.train_head_station = doc.attributes['trainheadstation']
-        self.origin_time        = Time.parse("#{date} #{doc.attributes['origtime']}")
-        self.destination_time   = Time.parse("#{date} #{doc.attributes['desttime']}")
-        self.index              = doc.attributes['trainidx'].to_i
-        self.bikeflag           = doc.attributes['bikeflag'] == '1'
+      def self.parse(doc, date)
+        line                    = StationLine.new
+        line.name               = doc.attributes['line']
+        line.train_head_station = doc.attributes['trainheadstation']
+        line.origin_time        = Time.parse("#{date} #{doc.attributes['origtime']}")
+        line.destination_time   = Time.parse("#{date} #{doc.attributes['desttime']}")
+        line.index              = doc.attributes['trainidx'].to_i
+        line.bikeflag           = doc.attributes['bikeflag'] == '1'
+
+        line
       end
     end
 
