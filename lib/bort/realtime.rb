@@ -39,7 +39,7 @@ module Bort
         self.platform  = options.delete(:platform)
         self.direction = options.delete(:direction)
 
-        raise InvalidOrigin.new(origin)       unless STATIONS.keys.map(&:to_s).include?(origin.downcase)
+        self.validate_station(origin)
         raise InvalidPlatform.new(platform)   unless platform.nil? || VALID_PLATFORMS.include?(platform.to_s)
         raise InvalidDirection.new(direction) unless direction.nil? || VALID_DIRECTIONS.include?(direction.to_s)
       end
@@ -61,7 +61,6 @@ module Bort
       end
     end
 
-    class InvalidOrigin     < RuntimeError; end
     class InvalidPlatform   < RuntimeError; end
     class InvalidDirection  < RuntimeError; end
 

@@ -69,6 +69,10 @@ module Bort
         raise InvalidDate.new(date)
       end
     end
+
+    def self.validate_station(station)
+      raise InvalidStation.new(station) unless STATIONS.keys.map(&:to_s) === station.to_s.downcase
+    end
   end
 
   STATIONS = {
