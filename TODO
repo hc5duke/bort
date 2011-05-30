@@ -1,4 +1,5 @@
-* finish rest of API
+* common class for station and train
+* compare function for Train
 * error handling
 * accept ruby time and date as well as strings
 * validate schedule number, station, etc
