@@ -1,6 +1,14 @@
 module Bort
   module Schedule
-    class ByTime
+    def self.trips_by_arrival(orig, dest, options={})
+      Trips.new('arrive', orig, dest, options).trips
+    end
+
+    def self.trips_by_departure(orig, dest, options={})
+      Trips.new('depart', orig, dest, options).trips
+    end
+
+    class Trips
       attr_accessor :origin, :destination, :time, :date, :before, :after,
         :legend, :schedule_number, :trips
 
@@ -30,7 +38,7 @@ module Bort
         self.after            = (data/:after).inner_html.to_i
         self.legend           = (data/:legend).inner_html
         self.schedule_number  = (data/:sched_num).inner_html
-        self.trips            = (data/:trip).map{|trip| Trip.new(trip)}
+        self.trips            = (data/:trip).map{|trip| Trip.parse(trip)}
       end
 
       private
@@ -50,16 +58,50 @@ module Bort
       end
     end
 
-    class Arrive < ByTime
-      def initialize(orig, dest, options={})
-        super('arrive', orig, dest, options)
+    class Trip
+      attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
+        :destination_time, :destination_date, :legs
+
+      def self.parse(doc)
+        trip = Trip.new
+        trip.origin           = doc.attributes['origin']
+        trip.destination      = doc.attributes['destination']
+        trip.fare             = doc.attributes['fare'].to_f
+        trip.origin_date      = Date.parse(doc.attributes['origtimedate'])
+        trip.destination_date = Date.parse(doc.attributes['desttimedate'])
+        trip.origin_time      = Time.parse("#{doc.attributes['origtimedate']} #{doc.attributes['origtimemin']}")
+        trip.destination_time = Time.parse("#{doc.attributes['desttimedate']} #{doc.attributes['desttimemin']}")
+        trip.legs             = (doc/:leg).map{|leg| Leg.parse(leg)}
+
+        trip
       end
     end
 
-    class Depart < ByTime
-      def initialize(orig, dest, options={})
-        super('depart', orig, dest, options)
+    class Leg
+      attr_accessor :order, :transfer_code, :origin, :destination,
+        :origin_time, :origin_date, :destination_time, :destination_date,
+        :line, :bikeflag, :train_head_station
+
+      def self.parse(doc)
+        leg = Leg.new
+        leg.order               = doc.attributes['order'].to_i
+        leg.transfer_code       = doc.attributes['transfercode']
+        leg.origin              = doc.attributes['origin']
+        leg.destination         = doc.attributes['destination']
+        leg.origin_date         = Date.parse(doc.attributes['origtimedate'])
+        leg.destination_date    = Date.parse(doc.attributes['desttimedate'])
+        leg.origin_time         = Time.parse("#{doc.attributes['origtimedate']} #{doc.attributes['origtimemin']}")
+        leg.destination_time    = Time.parse("#{doc.attributes['desttimedate']} #{doc.attributes['desttimemin']}")
+        leg.line                = doc.attributes['line']
+        leg.bikeflag            = doc.attributes['bikeflag'] == '1'
+        leg.train_head_station  = doc.attributes['trainheadstation']
+
+        leg
       end
+    end
+
+    def self.fare(orig, dest, options={})
+      Fare.new(orig, dest, options).fare
     end
 
     class Fare
@@ -201,43 +243,6 @@ module Bort
         self.legend = options.delete(:legend)
 
         Util.validate_date(date)
-      end
-    end
-
-    # helper classes
-    class Trip
-      attr_accessor :origin, :destination, :fare, :origin_time, :origin_date,
-        :destination_time, :destination_date, :legs
-
-      def initialize(doc)
-        self.origin           = doc.attributes['origin']
-        self.destination      = doc.attributes['destination']
-        self.fare             = doc.attributes['fare'].to_f
-        self.origin_date      = Date.parse(doc.attributes['origtimedate'])
-        self.destination_date = Date.parse(doc.attributes['desttimedate'])
-        self.origin_time      = Time.parse("#{doc.attributes['origtimedate']} #{doc.attributes['origtimemin']}")
-        self.destination_time = Time.parse("#{doc.attributes['desttimedate']} #{doc.attributes['desttimemin']}")
-        self.legs             = (doc/:leg).map{|leg| Leg.new(leg)}
-      end
-    end
-
-    class Leg
-      attr_accessor :order, :transfer_code, :origin, :destination,
-        :origin_time, :origin_date, :destination_time, :destination_date,
-        :line, :bikeflag, :train_head_station
-
-      def initialize(doc)
-        self.order              = doc.attributes['order'].to_i
-        self.transfer_code      = doc.attributes['transfercode']
-        self.origin             = doc.attributes['origin']
-        self.destination        = doc.attributes['destination']
-        self.origin_date        = Date.parse(doc.attributes['origtimedate'])
-        self.destination_date   = Date.parse(doc.attributes['desttimedate'])
-        self.origin_time        = Time.parse("#{doc.attributes['origtimedate']} #{doc.attributes['origtimemin']}")
-        self.destination_time   = Time.parse("#{doc.attributes['desttimedate']} #{doc.attributes['desttimemin']}")
-        self.line               = doc.attributes['line']
-        self.bikeflag           = doc.attributes['bikeflag'] == '1'
-        self.train_head_station = doc.attributes['trainheadstation']
       end
     end
 

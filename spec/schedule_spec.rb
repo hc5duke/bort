@@ -6,7 +6,7 @@ describe Schedule do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'arrive'))
 
-      @arrive       = Schedule::Arrive.new('dubl', 'daly')
+      @arrive       = Schedule::Trips.new('arrive', 'dubl', 'daly')
       @arrive_time  = Time.parse('May 27 17:28:00 -0700 2011')
       @origin_time  = Time.parse('May 27 16:50:00 -0700 2011')
       @xfer_time    = Time.parse('May 27 16:53:00 -0700 2011')
