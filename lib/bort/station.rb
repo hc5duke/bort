@@ -2,7 +2,7 @@ module Bort
   module Station
     class Access
       attr_accessor :origin, :legend, :parking_flag, :bike_flag,
-        :bike_station_flag, :locker_flag, :name, :abbreviation,
+        :bike_station_flag, :locker_flag, :abbreviation,
         :entering, :exiting, :parking, :fill_time, :car_share,
         :lockers, :bike_station_text, :destinations, :transit_info, :link
 
@@ -26,7 +26,6 @@ module Bort
         self.bike_flag          = station_data.attributes['bike_flag'] == '1'
         self.bike_station_flag  = station_data.attributes['bike_station_flag'] == '1'
         self.locker_flag        = station_data.attributes['locker_flag'] == '1'
-        self.name               = (station_data/:name).inner_text
         self.abbreviation       = (station_data/:abbr).inner_text
         self.entering           = (station_data/:entering).inner_text
         self.exiting            = (station_data/:exiting).inner_text
@@ -47,7 +46,7 @@ module Bort
     end
 
     class Info
-      attr_accessor :origin, :name, :abbreviation, :geo, :address, :city,
+      attr_accessor :origin, :abbreviation, :geo, :address, :city,
         :county, :state, :zip, :north_routes, :south_routes,
         :north_platforms, :south_platforms, :platform_info,
         :intro, :cross_street, :food, :shopping, :attraction, :link
@@ -64,7 +63,6 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.name             = (data/:name).inner_text
         self.abbreviation     = (data/:abbr).inner_text
         self.geo              = [(data/:gtfs_latitude).inner_text, (data/:gtfs_longitude).inner_text]
         self.address          = (data/:address).inner_text
@@ -101,10 +99,9 @@ module Bort
 
     # TODO probably could reuse this class in Station::Info
     class StationData
-      attr_accessor :name, :abbreviation, :address, :city, :county, :state, :zip
+      attr_accessor :abbreviation, :address, :city, :county, :state, :zip
 
       def initialize(doc)
-        self.name         = (doc/:name).inner_text
         self.abbreviation = (doc/:abbr).inner_text
         self.address      = (doc/:address).inner_text
         self.city         = (doc/:city).inner_text
