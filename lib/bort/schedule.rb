@@ -30,7 +30,7 @@ module Bort
         self.after            = (data/:after).inner_html.to_i
         self.legend           = (data/:legend).inner_html
         self.schedule_number  = (data/:sched_num).inner_html
-        self.trips = (data/:trip).map{|trip| Trip.new(trip)}
+        self.trips            = (data/:trip).map{|trip| Trip.new(trip)}
       end
 
       private
@@ -95,21 +95,16 @@ module Bort
       end
     end
 
-    class Holiday
-      attr_accessor :holidays
+    def self.holidays
+      download_options = {
+        :action => 'sched',
+        :cmd    => 'holiday',
+      }
 
-      def initialize
+      xml = Util.download(download_options)
+      data = Hpricot(xml)
 
-        download_options = {
-          :action => 'sched',
-          :cmd    => 'holiday',
-        }
-
-        xml = Util.download(download_options)
-        data = Hpricot(xml)
-
-        self.holidays = (data/:holiday).map{|holiday|HolidayData.new(holiday)}
-      end
+      (data/:holiday).map{|holiday|HolidayData.new(holiday)}
     end
 
     class RouteSchedule
@@ -148,45 +143,31 @@ module Bort
       end
     end
 
-    class Schedules
-      attr_accessor :schedules
+    def self.schedules
+      download_options = {
+        :action => 'sched',
+        :cmd    => 'scheds',
+      }
 
-      def initialize
+      xml = Util.download(download_options)
+      data = Hpricot(xml)
 
-        download_options = {
-          :action => 'sched',
-          :cmd    => 'scheds',
-        }
-
-        xml = Util.download(download_options)
-        data = Hpricot(xml)
-
-        self.schedules = (data/:schedule).map{|schedule| Schedule.new(schedule)}
-      end
+      (data/:schedule).map{|schedule| Schedule.new(schedule)}
     end
 
-    class Special
-      attr_accessor :legend, :special_schedules
+    def self.special_schedules
+      download_options = {
+        :action => 'sched',
+        :cmd    => 'special',
+      }
 
-      def initialize(options={})
-        load_options(options)
+      xml = Util.download(download_options)
+      data = Hpricot(xml)
 
-        download_options = {
-          :action => 'sched',
-          :cmd    => 'special',
-        }
+      # TODO: maybe print this out?
+      # legend = (data/:legend).inner_html
 
-        xml = Util.download(download_options)
-        data = Hpricot(xml)
-
-        self.legend             = (data/:legend).inner_html
-        self.special_schedules  = (data/:special_schedule).map{|special| SpecialSchedule.new(special)}
-      end
-
-      private
-      def load_options(options)
-        self.legend = options.delete(:legend)
-      end
+      (data/:special_schedule).map{|special| SpecialSchedule.new(special)}
     end
 
     class StationSchedule

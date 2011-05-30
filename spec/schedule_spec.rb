@@ -71,12 +71,12 @@ describe Schedule do
 
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'holiday'))
-      @holiday = Schedule::Holiday.new
+      @holidays = Schedule::holidays
     end
 
     it "should parse download data" do
-      @holiday.holidays.length.should == 9
-      holiday = @holiday.holidays.first
+      @holidays.length.should == 9
+      holiday = @holidays.first
       holiday.name.should == 'Thanksgiving Day'
       holiday.date.to_s.should == '2010-11-25'
       holiday.schedule_type.should == 'Sunday'
@@ -109,12 +109,12 @@ describe Schedule do
   describe "when querying schedules" do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'scheds'))
-      @schedules = Schedule::Schedules.new
+      @schedules = Schedule::schedules
     end
 
     it "should parse download data" do
-      @schedules.schedules.length.should == 4
-      schedule = @schedules.schedules.first
+      @schedules.length.should == 4
+      schedule = @schedules.first
       schedule.schedule_id.should == 29
       schedule.effective_date.should == Time.parse('Feb 19 00:00:00 -0800 2011')
     end
@@ -123,12 +123,12 @@ describe Schedule do
   describe "when querying special schedules" do
     before :each do
       Util.stub!(:download).and_return(response_file('schedule', 'special'))
-      @special = Schedule::Special.new
+      @special = Schedule::special_schedules
     end
 
     it "should parse download data" do
-      @special.special_schedules.length.should == 5
-      sched = @special.special_schedules.first
+      @special.length.should == 5
+      sched = @special.first
       sched.start_date.to_s.should == '2011-05-28'
       sched.end_date.to_s.should == '2011-05-28'
       sched.start_time.should == Time.parse('May 28 04:00:00 -0700 2011')
