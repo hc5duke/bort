@@ -1,5 +1,65 @@
 module Bort
   module Station
+    class Station
+      attr_accessor :abbreviation, :destinations,
+        :north_platforms, :north_routes, :south_platforms, :south_routes, :platform_info,
+        :geo, :address, :city, :county, :state, :zip, :cross_street,
+        :bike_flag, :bike_station_flag, :bike_station_text,
+        :parking, :parking_flag, :transit_info, :car_share, :entering, :exiting,
+        :attraction, :shopping, :food, :intro, :locker_flag, :lockers, :fill_time, :link
+
+      def self.parse(doc)
+        station = Station.new
+        station.abbreviation      = (doc/:abbr).inner_text
+        station.destinations      = (doc/:destinations).inner_text
+
+        station.north_routes      = (doc/:north_routes/:route).map(&:inner_text)
+        station.south_routes      = (doc/:south_routes/:route).map(&:inner_text)
+        station.north_platforms   = (doc/:north_platforms/:platform).map(&:inner_text).map(&:to_i)
+        station.south_platforms   = (doc/:south_platforms/:platform).map(&:inner_text).map(&:to_i)
+        station.platform_info     = (doc/:platform_info).inner_text
+
+        latitude                  = (doc/:gtfs_latitude).inner_text
+        longitude                 = (doc/:gtfs_longitude).inner_text
+        station.geo               = [latitude, longitude] if latitude and longitude
+        station.address           = (doc/:address).inner_text
+        station.city              = (doc/:city).inner_text
+        station.county            = (doc/:county).inner_text
+        station.state             = (doc/:state).inner_text
+        station.zip               = (doc/:zipcode).inner_text
+        station.cross_street      = (doc/:cross_street).inner_text
+
+        station.bike_flag         = parse_flag(doc.attributes['bike_flag'])
+        station.bike_station_flag = parse_flag(doc.attributes['bike_station_flag'])
+        station.bike_station_text = (doc/:bike_station_text).inner_text
+        station.parking           = (doc/:parking).inner_text
+        station.parking_flag      = parse_flag(doc.attributes['parking_flag'])
+        station.transit_info      = (doc/:transit_info).inner_text
+        station.car_share         = (doc/:car_share).inner_text
+        station.entering          = (doc/:entering).inner_text
+        station.exiting           = (doc/:exiting).inner_text
+
+        station.attraction        = (doc/:attraction).inner_text
+        station.shopping          = (doc/:shopping).inner_text
+        station.food              = (doc/:food).inner_text
+        station.intro             = (doc/:intro).inner_text
+        station.locker_flag       = parse_flag(doc.attributes['locker_flag'])
+        station.lockers           = (doc/:lockers).inner_text
+        station.fill_time         = (doc/:fill_time).inner_text
+        station.link              = (doc/:link).inner_text
+
+        station
+      end
+
+      def self.parse_flag(flag)
+        case flag
+        when '1' then true
+        when '0' then false
+        else nil
+        end
+      end
+    end
+
     def self.access_info(station, print_legend=false)
 
       download_options = {
@@ -13,7 +73,7 @@ module Bort
       data = Hpricot(xml)
 
       puts (data/:legend).inner_text if print_legend
-      Station.new((data/:station).first)
+      Station.parse((data/:station).first)
     end
 
     def self.info(station)
@@ -26,7 +86,7 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      Station.new(data)
+      Station.parse((data/:station).first)
     end
 
     def self.stations
@@ -39,64 +99,8 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      (data/:station).map{|station| Station.new(station)}
+      (data/:station).map{|station| Station.parse(station)}
     end
 
-    class Station
-      attr_accessor :abbreviation, :destinations,
-        :north_platforms, :north_routes, :south_platforms, :south_routes, :platform_info,
-        :geo, :address, :city, :county, :state, :zip, :cross_street,
-        :bike_flag, :bike_station_flag, :bike_station_text,
-        :parking, :parking_flag, :transit_info, :car_share, :entering, :exiting,
-        :attraction, :shopping, :food, :intro, :locker_flag, :lockers, :fill_time, :link
-
-      def initialize(doc)
-        self.abbreviation       = (doc/:abbr).inner_text
-        self.destinations       = (doc/:destinations).inner_text
-
-        self.north_routes       = (doc/:north_routes/:route).map(&:inner_text)
-        self.south_routes       = (doc/:south_routes/:route).map(&:inner_text)
-        self.north_platforms    = (doc/:north_platforms/:platform).map(&:inner_text).map(&:to_i)
-        self.south_platforms    = (doc/:south_platforms/:platform).map(&:inner_text).map(&:to_i)
-        self.platform_info      = (doc/:platform_info).inner_text
-
-        latitude                = (doc/:gtfs_latitude).inner_text
-        longitude               = (doc/:gtfs_longitude).inner_text
-        self.geo                = [latitude, longitude] if latitude and longitude
-        self.address            = (doc/:address).inner_text
-        self.city               = (doc/:city).inner_text
-        self.county             = (doc/:county).inner_text
-        self.state              = (doc/:state).inner_text
-        self.zip                = (doc/:zipcode).inner_text
-        self.cross_street       = (doc/:cross_street).inner_text
-
-        self.bike_flag          = parse_flag(doc.attributes['bike_flag']) rescue ''
-        self.bike_station_flag  = parse_flag(doc.attributes['bike_station_flag']) rescue ''
-        self.bike_station_text  = (doc/:bike_station_text).inner_text
-        self.parking            = (doc/:parking).inner_text
-        self.parking_flag       = parse_flag(doc.attributes['parking_flag']) rescue ''
-        self.transit_info       = (doc/:transit_info).inner_text
-        self.car_share          = (doc/:car_share).inner_text
-        self.entering           = (doc/:entering).inner_text
-        self.exiting            = (doc/:exiting).inner_text
-
-        self.attraction         = (doc/:attraction).inner_text
-        self.shopping           = (doc/:shopping).inner_text
-        self.food               = (doc/:food).inner_text
-        self.intro              = (doc/:intro).inner_text
-        self.locker_flag        = parse_flag(doc.attributes['locker_flag']) rescue ''
-        self.lockers            = (doc/:lockers).inner_text
-        self.fill_time          = (doc/:fill_time).inner_text
-        self.link               = (doc/:link).inner_text
-      end
-
-      def parse_flag(flag)
-        case flag
-        when '1' then true
-        when '0' then false
-        else nil
-        end
-      end
-    end
   end
 end
