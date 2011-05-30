@@ -14,6 +14,12 @@ describe Route do
       all_routes = ["DALY-DUBL", "DALY-FRMT", "DUBL-DALY", "FRMT-DALY", "FRMT-RICH", "MLBR-RICH", "PITT-SFIA", "RICH-FRMT", "RICH-MLBR", "SFIA-PITT"]
       @routes.routes.map(&:abbreviation).sort.inspect.should == all_routes.inspect
     end
+
+    it "should get info on particular routes" do
+      Util.stub!(:download).and_return(response_file('route', 'routeinfo'))
+      info = @routes.routes.first.info
+      info.stations.count.should == 19
+    end
   end
 
   describe "when querying routeinfo" do

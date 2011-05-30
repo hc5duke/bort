@@ -41,6 +41,10 @@ module Bort
         self.number       = (doc/:number).inner_html
         self.color        = (doc/:color).inner_html
       end
+
+      def info(options={})
+        RouteInfo.new(number, options)
+      end
     end
 
     class RouteInfo
