@@ -5,28 +5,25 @@ describe Station do
 
     before :each do
       Util.stub!(:download).and_return(response_file('station', 'stnaccess'))
-      @access = Station::Access.new('dubl')
+      @station = Station::access_info('dubl')
     end
 
     it "should parse download data" do
-      @access.origin.should == 'dubl'
-      @access.legend.length.should > 10
-      @access.parking_flag.should == false
-      @access.bike_flag.should == false
-      @access.bike_station_flag.should == false
-      @access.locker_flag.should == true
-      @access.name.should == '12th St. Oakland City Center'
-      @access.abbreviation.should == '12TH'
-      @access.entering.length.should > 10
-      @access.exiting.length.should > 10
-      @access.parking.length.should > 10
-      @access.fill_time.should == ''
-      @access.car_share.should == ''
-      @access.lockers.length.should > 10
-      @access.bike_station_text.should == ''
-      @access.destinations.length.should > 10
-      @access.transit_info.length.should > 10
-      @access.link.should == ''
+      @station.parking_flag.should == false
+      @station.bike_flag.should == false
+      @station.bike_station_flag.should == false
+      @station.locker_flag.should == true
+      @station.abbreviation.should == '12TH'
+      @station.entering.length.should > 10
+      @station.exiting.length.should > 10
+      @station.parking.length.should > 10
+      @station.fill_time.should == ''
+      @station.car_share.should == ''
+      @station.lockers.length.should > 10
+      @station.bike_station_text.should == ''
+      @station.destinations.length.should > 10
+      @station.transit_info.length.should > 10
+      @station.link.should == ''
     end
   end
 
@@ -34,30 +31,28 @@ describe Station do
 
     before :each do
       Util.stub!(:download).and_return(response_file('station', 'stninfo'))
-      @info = Station::Info.new('24TH')
+      @station = Station::info('24TH')
     end
 
     it "should parse download data" do
-      @info.origin.should == '24TH'
-      @info.name.should == '24th St. Mission'
-      @info.abbreviation.should == '24TH'
-      @info.geo.inspect.should == %q(["37.752254", "-122.418466"])
-      @info.address.should == '2800 Mission Street'
-      @info.city.should == 'San Francisco'
-      @info.county.should == 'sanfrancisco'
-      @info.state.should == 'CA'
-      @info.zip.should == '94110'
-      @info.north_routes.length.should == 4
-      @info.south_routes.length.should == 4
-      @info.north_platforms.first.should == 2
-      @info.south_platforms.first.should == 1
-      @info.platform_info.length.should > 10
-      @info.intro.length.should > 10
-      @info.cross_street.length.should > 10
-      @info.food.length.should > 10
-      @info.shopping.length.should > 10
-      @info.attraction.length.should > 10
-      @info.link.should == ''
+      @station.abbreviation.should == '24TH'
+      @station.geo.inspect.should == %q(["37.752254", "-122.418466"])
+      @station.address.should == '2800 Mission Street'
+      @station.city.should == 'San Francisco'
+      @station.county.should == 'sanfrancisco'
+      @station.state.should == 'CA'
+      @station.zip.should == '94110'
+      @station.north_routes.length.should == 4
+      @station.south_routes.length.should == 4
+      @station.north_platforms.first.should == 2
+      @station.south_platforms.first.should == 1
+      @station.platform_info.length.should > 10
+      @station.intro.length.should > 10
+      @station.cross_street.length.should > 10
+      @station.food.length.should > 10
+      @station.shopping.length.should > 10
+      @station.attraction.length.should > 10
+      @station.link.should == ''
     end
   end
 
@@ -71,7 +66,6 @@ describe Station do
     it "should parse download data" do
       @stations.length.should == 44
       station = @stations.first
-      station.name.should == "12th St. Oakland City Center"
       station.abbreviation.should == "12TH"
       station.address.should == '1245 Broadway'
       station.city.should == 'Oakland'
