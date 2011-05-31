@@ -1,6 +1,6 @@
 Comprehensive BART API ruby wrapper. Sorry for the lack of
 good documentation, but everything available at api.bart.gov
-is available in this gem. I&amp;ve also created a few
+is available in this gem. I&#39;ve also created a few
 &quot;shortcuts&quot; below:
 
 ## Installation
