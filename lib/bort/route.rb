@@ -7,7 +7,7 @@ module Bort
         route.name         = (doc/:name).inner_text
         route.abbreviation = (doc/:abbr).inner_text
         route.route_id     = (doc/:routeid).inner_text
-        route.number       = (doc/:number).inner_text
+        route.number       = (doc/:number).inner_text.to_i
         route.color        = (doc/:color).inner_text
 
         route
@@ -19,6 +19,10 @@ module Bort
 
       def schedule(options={})
         Schedule::RouteSchedule.new(number, options)
+      end
+
+      def <=> other
+        self.number <=> other.number
       end
     end
 
@@ -45,7 +49,7 @@ module Bort
         self.schedule_number = (data/:sched_num).inner_text
         self.routes = (data/:route).map do |route|
           Route.parse(route)
-        end
+        end.sort
       end
 
       private

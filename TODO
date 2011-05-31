@@ -3,3 +3,7 @@
 * error handling
 * accept ruby time and date as well as strings
 * validate schedule number, station, etc
+
+Bugs in the API Doc:
+* http://api.bart.gov/docs/sched/stnsched.aspx
+  org=<stn> should read orig=<stn>

@@ -63,7 +63,7 @@ module Bort
     def self.access_info(station, print_legend=false)
 
       download_options = {
-        :action => 'station',
+        :action => 'stn',
         :cmd => 'stnaccess',
         :orig => station,
         :l => print_legend ? '1' : '0',
@@ -78,7 +78,7 @@ module Bort
 
     def self.info(abbreviation)
       download_options = {
-        :action => 'station',
+        :action => 'stn',
         :cmd => 'stninfo',
         :orig => abbreviation,
       }
@@ -92,7 +92,7 @@ module Bort
     def self.stations
 
       download_options = {
-        :action => 'station',
+        :action => 'stn',
         :cmd => 'stns',
       }
 

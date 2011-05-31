@@ -32,12 +32,12 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.date             = Date.parse((data/:date).inner_html)
-        self.time             = Time.parse("#{(data/:date).inner_html} #{(data/:time).inner_html}")
-        self.before           = (data/:before).inner_html.to_i
-        self.after            = (data/:after).inner_html.to_i
-        self.legend           = (data/:legend).inner_html
-        self.schedule_number  = (data/:sched_num).inner_html
+        self.date             = Date.parse((data/:date).inner_text)
+        self.time             = Time.parse("#{(data/:date).inner_text} #{(data/:time).inner_text}")
+        self.before           = (data/:before).inner_text.to_i
+        self.after            = (data/:after).inner_text.to_i
+        self.legend           = (data/:legend).inner_text
+        self.schedule_number  = (data/:sched_num).inner_text
         self.trips            = (data/:trip).map{|trip| Trip.parse(trip)}
       end
 
@@ -124,8 +124,8 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.schedule_number  = (data/:sched_num).inner_html.to_i
-        self.fare             = (data/:fare).inner_html.to_f
+        self.schedule_number  = (data/:sched_num).inner_text.to_i
+        self.fare             = (data/:fare).inner_text.to_f
       end
 
       private
@@ -154,9 +154,9 @@ module Bort
 
       def self.parse(doc)
         data                = HolidayData.new
-        data.name           = (doc/:name).inner_html
-        data.date           = Date.parse((doc/:date).inner_html)
-        data.schedule_type  = (doc/:schedule_type).inner_html
+        data.name           = (doc/:name).inner_text
+        data.date           = Date.parse((doc/:date).inner_text)
+        data.schedule_type  = (doc/:schedule_type).inner_text
 
         data
       end
@@ -181,10 +181,10 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.date             = Date.parse((data/:date).inner_html)
-        self.schedule_number  = (data/:sched_num).inner_html.to_i
+        self.date             = Date.parse((data/:date).inner_text)
+        self.schedule_number  = (data/:sched_num).inner_text.to_i
         self.trains           = (data/:train).map{|train| TrainSchedule.parse(train, date)}
-        self.legend           = (data/:legend).inner_html
+        self.legend           = (data/:legend).inner_text
       end
 
       private
@@ -232,7 +232,7 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      (data/:schedule).map{|schedule| Schedule.parse(schedule)}
+      (data/:schedule).map{|schedule| Schedule.parse(schedule)}.sort
     end
 
     class Schedule
@@ -244,6 +244,10 @@ module Bort
         schedule.effective_date = Time.parse(doc.attributes['effectivedate'])
 
         schedule
+      end
+
+      def <=> other
+        self.schedule_id <=> other.schedule_id
       end
     end
 
@@ -257,7 +261,7 @@ module Bort
       xml = Util.download(download_options)
       data = Hpricot(xml)
 
-      puts (data/:legend).inner_html if print_legend
+      puts (data/:legend).inner_text if print_legend
 
       (data/:special_schedule).map{|special| SpecialSchedule.parse(special)}
     end
@@ -268,16 +272,16 @@ module Bort
 
       def self.parse(doc)
         schedule                  = SpecialSchedule.new
-        schedule.start_date       = Date.parse((doc/:start_date).inner_html)
-        schedule.end_date         = Date.parse((doc/:end_date).inner_html)
-        schedule.start_time       = Time.parse("#{schedule.start_date.to_s} #{(doc/:start_time).inner_html}")
-        schedule.end_time         = Time.parse("#{schedule.end_date.to_s} #{(doc/:end_time).inner_html}")
-        schedule.text             = (doc/:text).inner_html
-        schedule.link             = (doc/:link).inner_html
-        schedule.origin           = (doc/:orig).inner_html
-        schedule.destination      = (doc/:dest).inner_html
-        schedule.day_of_week      = (doc/:day_of_week).inner_html.split(',').map(&:to_i)
-        schedule.routes_affected  = (doc/:routes_affected).inner_html.split(',')
+        schedule.start_date       = Date.parse((doc/:start_date).inner_text)
+        schedule.end_date         = Date.parse((doc/:end_date).inner_text)
+        schedule.start_time       = Time.parse("#{schedule.start_date.to_s} #{(doc/:start_time).inner_text}")
+        schedule.end_time         = Time.parse("#{schedule.end_date.to_s} #{(doc/:end_time).inner_text}")
+        schedule.text             = (doc/:text).inner_text
+        schedule.link             = (doc/:link).inner_text
+        schedule.origin           = (doc/:orig).inner_text
+        schedule.destination      = (doc/:dest).inner_text
+        schedule.day_of_week      = (doc/:day_of_week).inner_text.split(',').map(&:to_i)
+        schedule.routes_affected  = (doc/:routes_affected).inner_text.split(',')
 
         schedule
       end
@@ -291,8 +295,8 @@ module Bort
 
         download_options = {
           :action => 'sched',
-          :cmd    => 'special',
-          :org    => origin,
+          :cmd    => 'stnsched',
+          :orig   => origin,
           :date   => date,
           :l      => legend,
         }
@@ -300,11 +304,11 @@ module Bort
         xml = Util.download(download_options)
         data = Hpricot(xml)
 
-        self.date             = Date.parse((data/:date).inner_html)
-        self.schedule_number  = (data/:sched_num).inner_html.to_i
-        self.name             = (data/:name).inner_html
-        self.abbreviation     = (data/:abbr).inner_html
-        self.legend           = (data/:legend).inner_html
+        self.date             = Date.parse((data/:date).inner_text)
+        self.schedule_number  = (data/:sched_num).inner_text.to_i
+        self.name             = (data/:name).inner_text
+        self.abbreviation     = (data/:abbr).inner_text
+        self.legend           = (data/:legend).inner_text
         self.schedules        = (data/:station/:item).map{|line| StationLine.parse(line, date)}
       end
 

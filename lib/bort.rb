@@ -14,15 +14,15 @@ module Bort
   def Bort(key); Bort::Bort(key); end
 
   # shortcuts
-  def self.estimates(orig, options={})
-    Realtime::Estimates.new(orig, options)
+  def self.trains_near(orig, filters={})
+    Realtime::Estimates.new(orig).select(filters)
   end
 
   def self.routes(options={})
     Route.routes(options)
   end
 
-  def self.route_info(route_number, options={})
+  def self.route(route_number, options={})
     Route::Info.new(route_number, options)
   end
 
@@ -79,7 +79,7 @@ module Bort
       hm, ap = time.split('+')
       hh, mm = hm.split(':').map(&:to_i)
 
-      unless /^\d{1,2}:\d{1,2}+\w\w$/ === time &&
+      unless /^\d{1,2}:\d{1,2}\+\w\w$/ === time &&
         VALID_AM_PM.include?(ap.downcase) &&
         (1..12) === hh &&
         (0..59) === mm
