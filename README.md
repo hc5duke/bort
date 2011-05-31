@@ -23,7 +23,7 @@ Schedule &amp; planning trips
     Bort.trips('dubl', 'mont', :date => '6/10/2011', :time => '09:00+AM')
     => ... # trips from Dublin/Pleasanton to Montgomery on 6/10 around 9 AM
 
-    Bort.fare('dubl', 'mont', :date => '6/10/2011', :time => '09:00+AM')
+    Bort.fare('dubl', 'mont')
     => 5.55
 
     Bort.schedules
