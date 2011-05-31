@@ -1,4 +1,4 @@
-* common class for station and train
+* common class for train
 * compare function for Train
 * error handling
 * accept ruby time and date as well as strings

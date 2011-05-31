@@ -317,6 +317,7 @@ module Bort
       end
     end
 
+    # TODO: DRY with Leg?
     class StationLine
 
       attr_accessor :name, :train_head_station, :origin_time, :destination_time, :index, :bike_flag

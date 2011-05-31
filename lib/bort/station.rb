@@ -76,11 +76,11 @@ module Bort
       Station.parse((data/:station).first)
     end
 
-    def self.info(station)
+    def self.info(abbreviation)
       download_options = {
         :action => 'station',
         :cmd => 'stninfo',
-        :orig => station,
+        :orig => abbreviation,
       }
 
       xml = Util.download(download_options)

@@ -14,9 +14,42 @@ module Bort
   def Bort(key); Bort::Bort(key); end
 
   # shortcuts
-  def self.departures(orig, options={});               Realtime::Etd.new(orig, options); end
-  def self.by_arrival_time(orig, dest, options={});    Schedule::Arrive.new(orig, dest, options); end
-  def self.by_departure_time(orig, dest, options={});  Schedule::Depart.new(orig, dest, options); end
+  def self.estimates(orig, options={})
+    Realtime::Estimates.new(orig, options)
+  end
+
+  def self.routes(options={})
+    Route.routes(options)
+  end
+
+  def self.route_info(route_number, options={})
+    Route::Info.new(route_number, options)
+  end
+
+  def self.trips(orig, dest, options={})
+    command = options.delete(:by) { 'arrive' }
+    Schedule::Trips.new(command, orig, dest, options).trips
+  end
+
+  def self.fare(orig, dest, options={})
+    Schedule::fare(orig, dest, options)
+  end
+
+  def self.schedules
+    Schedule.schedules
+  end
+
+  def self.schedule_at(abbreviation, options={})
+    Schedule::StationSchedule.new(abbreviation, options).schedules
+  end
+
+  def self.stations
+    Station.stations
+  end
+
+  def self.station_info(abbreviation)
+    Station.info(abbreviation)
+  end
 
   class Util
     def self.set_key(key)
