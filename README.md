@@ -2,13 +2,17 @@ Comprehensive BART API ruby wrapper.
 
 ## Usage
 
-Departure times
+Set up API key
 
     require 'bort'
     Bort::Bort('MW9S-E7SL-26DU-VV8V') # set your own API key here
 
+Real-time data
+
     trains = Bort.trains_near('mont', :color => 'blue', :direction => 'n')
     => ... # trains near Montgomery station going Northbound on the blue line
+
+Schedule &amp; planning trips
 
     routes = Bort.routes
     => ... # all routes
@@ -27,6 +31,8 @@ Departure times
 
     Bort.schedule_at('mont')
     => ... # schedule at Montgomery for today
+
+Station data
 
     Bort.stations
     => ... # all 44 stations and partial info on them
