@@ -48,3 +48,7 @@ Station data
 
     Bort.station_info('mont')
     => ... # more info on Montgomery station
+
+## Inspired by
+
+https://github.com/jish/bart
